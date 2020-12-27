@@ -1,0 +1,9 @@
+﻿<Project TreatAsLocalProperty="TaskFolder;TaskAssembly">
+    <PropertyGroup>
+        <TaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' ">netstandard2.1</TaskFolder>
+        <TaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' ">net48</TaskFolder>
+        <TaskAssembly>$(MSBuildThisFileDirectory)..\tasks\$(TaskFolder)\DalamudPackager.dll</TaskAssembly>
+    </PropertyGroup>
+
+    <UsingTask TaskName="DalamudPackager" AssemblyFile="$(TaskAssembly)" />
+</Project>

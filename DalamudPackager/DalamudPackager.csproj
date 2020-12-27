@@ -1,0 +1,62 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Nullable>enable</Nullable>
+        <LangVersion>8</LangVersion>
+        <TargetFrameworks>netstandard2.1;net48</TargetFrameworks>
+        <!-- Suppresses the warnings about the package not having assemblies in lib/*/.dll.-->
+        <NoPackageAnalysis>true</NoPackageAnalysis>
+        <!-- forces SDK to copy dependencies into build output to make packing easier -->
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <!-- Change the default location where NuGet will put the build output -->
+        <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Title>Dalamud Packager</Title>
+        <Description>An MSBuild task that simplifies making Dalamud plugins by generating a manifest and packing the build output into a release-ready zip.</Description>
+        <PackageLicenseExpression>EUPL-1.2</PackageLicenseExpression>
+        <PackageVersion>1.0.0</PackageVersion>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <FileVersion>1.0.0</FileVersion>
+        <Authors>Anna Clemens</Authors>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Content Include="build\DalamudPackager.props">
+            <PackagePath>build\</PackagePath>
+        </Content>
+        <Content Include="buildMultiTargeting\DalamudPackager.props">
+            <PackagePath>buildMultiTargeting\</PackagePath>
+        </Content>
+
+        <Content Include="build\DalamudPackager.targets">
+            <PackagePath>build\</PackagePath>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Build.Framework" Version="16.8.0" />
+        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.8.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+        <PackageReference Include="YamlDotNet" Version="9.1.0" />
+        <PackageReference Update="@(PackageReference)" PrivateAssets="All" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="System.IO.Compression" />
+    </ItemGroup>
+
+    <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
+        <!--
+        The include needs to happen after output has been copied to build output folder
+        but before NuGet generates a nuspec. See https://github.com/NuGet/Home/issues/4704.
+        -->
+        <ItemGroup>
+            <_PackageFiles Include="bin\$(Configuration)\*\Newtonsoft.Json.dll;bin\$(Configuration)\*\YamlDotNet.dll">
+                <PackagePath>tasks\%(RecursiveDir)</PackagePath>
+                <Visible>false</Visible>
+                <BuildAction>Content</BuildAction>
+            </_PackageFiles>
+        </ItemGroup>
+    </Target>
+
+</Project>

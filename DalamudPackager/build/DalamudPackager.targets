@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+    <PropertyGroup>
+        <PackagerTargetFile>$(ProjectDir)DalamudPackager.targets</PackagerTargetFile>
+    </PropertyGroup>
+
+    <Import Project="$(PackagerTargetFile)" Condition="Exists('$(PackagerTargetFile)')" />
+
+    <Target Name="DefaultDalamudPackager"
+            AfterTargets="Build"
+            Condition="'$(Configuration)' == 'Release' and !Exists('$(PackagerTargetFile)')">
+        <DalamudPackager ProjectDir="$(ProjectDir)"
+                         OutputPath="$(OutputPath)"
+                         AssemblyName="$(AssemblyName)"
+                         MakeZip="true"/>
+    </Target>
+</Project>
