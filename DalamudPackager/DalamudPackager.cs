@@ -95,7 +95,7 @@ namespace DalamudPackager {
             var excludeLen = this.ExcludeFiles.Count;
 
             if (includeLen > 0 && excludeLen > 0) {
-                this.Log.LogError("Specify either Include of Exclude on your DalamudPackager task, not both.");
+                this.Log.LogError("Specify either Include or Exclude on your DalamudPackager task, not both.");
                 return false;
             }
 
