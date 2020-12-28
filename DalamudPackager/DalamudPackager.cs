@@ -191,7 +191,9 @@ namespace DalamudPackager {
             });
 
             using var jsonFile = File.Open(jsonPath, FileMode.Create);
-            using var jsonStream = new StreamWriter(jsonFile);
+            using var jsonStream = new StreamWriter(jsonFile) {
+                NewLine = "\n",
+            };
             jsonSerialiser.Serialize(jsonStream, manifest);
         }
 
