@@ -275,6 +275,11 @@ namespace DalamudPackager {
         /// The API level of this plugin.
         /// </summary>
         public int DalamudApiLevel { get; set; } = 2;
+        
+        /// <summary>
+        /// Load priority for this plugin. Higher values means higher priority. 0 is default priority.
+        /// </summary>
+        public int LoadPriority { get; set; }
 
         internal bool LogMissing(TaskLoggingHelper log) {
             var anyNull = this.Name == null || this.Author == null || this.Description == null;
