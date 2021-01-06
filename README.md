@@ -59,7 +59,9 @@ you will find the following JSON file in your output directory.
   "ApplicableVersion": "any",
   "RepoUrl": "https://example.com/",
   // this will be set to 2 automatically
-  "DalamudApiLevel": 2
+  "DalamudApiLevel": 2,
+  // this will be set to 0 automatically
+  "LoadPriority": 0
 }
 ```
 
