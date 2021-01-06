@@ -14,9 +14,9 @@
         <Title>DalamudPackager</Title>
         <Description>An MSBuild task that simplifies making Dalamud plugins by generating a manifest and packing the build output into a release-ready zip.</Description>
         <PackageLicenseExpression>EUPL-1.2</PackageLicenseExpression>
-        <PackageVersion>1.0.1</PackageVersion>
-        <AssemblyVersion>1.0.1</AssemblyVersion>
-        <FileVersion>1.0.1</FileVersion>
+        <PackageVersion>1.1.0</PackageVersion>
+        <AssemblyVersion>1.1.0</AssemblyVersion>
+        <FileVersion>1.1.0</FileVersion>
         <Authors>Anna Clemens</Authors>
         <PackageProjectUrl>https://github.com/goatcorp/DalamudPackager</PackageProjectUrl>
         <RepositoryUrl>https://github.com/goatcorp/DalamudPackager</RepositoryUrl>
