@@ -5,8 +5,28 @@ This is an MSBuild task that is designed to simplify creating plugins for [Dalam
 Install the NuGet package `DalamudPackager`. When you build in release mode, a folder will be placed in your output directory
 containing your plugin manifest and `latest.zip`.
 
-If you need to configure the task, create a file called `DalamudPackager.targets` in your project and use the template
-below.
+## Table of contents
+
+1. [DalamudPackager][toc-1]
+2. [Table of contents][toc-2]
+3. [Configuration][toc-3]
+4. [Manifest generation][toc-4]
+5. [YAML manifests][toc-5]
+6. [`.zip` file generation][toc-6]
+7. [Task attributes][toc-7]
+
+[toc-1]: #dalamudpackager
+[toc-2]: #table-of-contents
+[toc-3]: #configuration
+[toc-4]: #manifest-generation
+[toc-5]: #yaml-manifests
+[toc-6]: #zip-file-generation
+[toc-7]: #task-attributes
+
+## Configuration
+
+If you need to additionally configure the task, create a file called `DalamudPackager.targets` in your project and use the
+template below.
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -26,25 +46,18 @@ below.
 DalamudPackager reduces the amount of keys you need to include in your manifest, filling in the rest from sane defaults
 or your assembly. You can, of course, specify everything manually.
 
-In addition, DalamudPackager allows you to use YAML, a more human-friendly format, for your manifest instead of JSON.
-YAML uses **snake_case** for keys. JSON uses **PascalCase** for keys. The example below is a YAML manifest, but
-generation works the same for JSON manifests.
-
-```yaml
-name: Test Plugin
-author: You
-description: |-
-  This is a test plugin - this first line is a summary.
-
-  Down here is a more detailed explanation of what the plugin
-  does, manually wrapped to make sure it stays visible in the
-  installer.
-repo_url: https://example.com/
+```json5
+{
+    "Name": "Test Plugin",
+    "Author": "You",
+    "Description": "This is a test plugin",
+    "RepoUrl": "https://example.com/"
+}
 ```
 
-Notice how keys like `assembly_version` and `dalamud_api_level` are missing. You can include these if you'd like, but
-DalamudPackager will automatically do it for you when you build your project. If you build your project in Release mode,
-you will find the following JSON file in your output directory.
+Notice how keys like `AssemblyVersion` and `DalamudApiLevel` are missing. You can include these if you'd like, but
+DalamudPackager will automatically do it for you when you build your project. If you build a project with this manifest
+in Release mode, you will find the following JSON file in your output directory.
 
 ```json5
 {
@@ -63,6 +76,24 @@ you will find the following JSON file in your output directory.
   // this will be set to 0 automatically
   "LoadPriority": 0
 }
+```
+
+## YAML manifests
+
+In addition, DalamudPackager allows you to use YAML, a more human-friendly format, for your manifest instead of JSON.
+YAML uses **snake_case** for keys instead of PascalCase, like JSON. All the features of DalamudPackager work with YAML
+manifests. Just end your manifest's file name with `.yaml` instead of `.json` to make use of it.
+
+```yaml
+name: Test Plugin
+author: You
+description: |-
+  This is a test plugin - this first line is a summary.
+
+  Down here is a more detailed explanation of what the plugin
+  does, manually wrapped to make sure it stays visible in the
+  installer.
+repo_url: https://example.com/
 ```
 
 ## `.zip` file generation
