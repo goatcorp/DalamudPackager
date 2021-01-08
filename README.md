@@ -81,7 +81,7 @@ references, set up a task to clean your output directory, or use `Exclude` or `I
 | `ProjectDir` | This is the path where your `csproj` is located. You must set this to `$(ProjectDir)`. | **Yes** | *None* - set to `$(ProjectDir)` |
 | `OutputPath` | This is the path that your assemblies are output to after build. You must set this to `$(OutputPath)`. | **Yes** | *None* - set to `$(OutputPath)` |
 | `AssemblyName` | This is the name of the assembly that Dalamud will be loading. You used to need to specify this in your manifest as `InternalName`. | **Yes** | *None* - set to `$(AssemblyName)` |
-| `ManifestType` | You can choose between `json` and `yaml` for your manifest file. | No | `json` |
+| `ManifestType` | You can choose between `auto`, `json`, and `yaml` for your manifest file. `auto` will use `json` first, then fall back on `yaml`. | No | `auto` |
 | `VersionComponents` | How many components of the assembly's version to include in the generated manifest. If you use semantic versioning, set this to `3`. | No | `4` |
 | `MakeZip` | If this is `true`, a folder will be created in your `OutputPath` that contains your generated manifest and `latest.zip`, ready for PRing. | No | `false` |
 | `Exclude` | Files to exclude from the zip if `MakeZip` is `true`. Mutually exclusive with `Include`. Files should be separated by a semicolon (`;`) and be relative to `OutputPath`. Files do not need to exist. | No | *None* |

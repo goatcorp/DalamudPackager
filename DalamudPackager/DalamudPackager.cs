@@ -36,14 +36,15 @@ namespace DalamudPackager {
         public string OutputPath { get; set; } = null!;
 
         /// <summary>
-        /// This can be either "json" or "yaml"
+        /// This can be either "auto", "json", or "yaml"
         /// </summary>
-        public string ManifestType { get; set; } = "json";
+        public string ManifestType { get; set; } = "auto";
 
         private ManifestKind RealManifestType => this.ManifestType switch {
+            "auto" => ManifestKind.Auto,
             "json" => ManifestKind.Json,
             "yaml" => ManifestKind.Yaml,
-            _ => throw new ArgumentException("Invalid manifest type: expected either 'json' or 'yaml'", nameof(this.ManifestType)),
+            _ => throw new ArgumentException("Invalid manifest type: expected either 'auto', 'json', or 'yaml'", nameof(this.ManifestType)),
         };
 
         public byte VersionComponents { get; set; } = 4;
@@ -61,6 +62,11 @@ namespace DalamudPackager {
         public override bool Execute() {
             // load the manifest from the source file
             var manifest = this.LoadManifest();
+
+            if (manifest == null) {
+                this.Log.LogError("Could not find manifest file in project directory.");
+                return false;
+            }
 
             // verify required fields on the manifest
             if (manifest.LogMissing(this.Log)) {
@@ -150,23 +156,32 @@ namespace DalamudPackager {
             return System.Reflection.AssemblyName.GetAssemblyName(fullPath);
         }
 
-        private Manifest LoadManifest() {
-            var ext = this.RealManifestType switch {
-                ManifestKind.Json => "json",
-                ManifestKind.Yaml => "yaml",
+        private Manifest? LoadManifest() {
+            var exts = this.RealManifestType switch {
+                ManifestKind.Auto => new[] {"json", "yaml"},
+                ManifestKind.Json => new[] {"json"},
+                ManifestKind.Yaml => new[] {"yaml"},
                 _ => throw new ArgumentOutOfRangeException($"extension doesn't exist for {this.RealManifestType}"),
             };
 
-            var manifestPath = Path.Combine(this.ProjectDir, $"{this.AssemblyName}.{ext}");
+            foreach (var ext in exts) {
+                var manifestPath = Path.Combine(this.ProjectDir, $"{this.AssemblyName}.{ext}");
 
-            using var manifestFile = File.Open(manifestPath, FileMode.Open);
-            using var manifestStream = new StreamReader(manifestFile);
+                if (!File.Exists(manifestPath)) {
+                    continue;
+                }
 
-            return this.RealManifestType switch {
-                ManifestKind.Json => LoadJsonManifest(manifestStream),
-                ManifestKind.Yaml => LoadYamlManifest(manifestStream),
-                _ => throw new Exception("unreachable"),
-            };
+                using var manifestFile = File.Open(manifestPath, FileMode.Open);
+                using var manifestStream = new StreamReader(manifestFile);
+
+                return ext switch {
+                    "json" => LoadJsonManifest(manifestStream),
+                    "yaml" => LoadYamlManifest(manifestStream),
+                    _ => throw new Exception("unreachable"),
+                };
+            }
+
+            return null;
         }
 
         private static Manifest LoadYamlManifest(TextReader reader) {
@@ -214,6 +229,11 @@ namespace DalamudPackager {
     }
 
     public enum ManifestKind {
+        /// <summary>
+        /// Automatically searches for JSON manifests, then searches for YAML manifests if no JSON could be found.
+        /// </summary>
+        Auto,
+
         /// <summary>
         /// Superior manifest type. Easier for human consumption. Will be converted into JSON for machine consumption
         /// during the build process.
@@ -275,7 +295,7 @@ namespace DalamudPackager {
         /// The API level of this plugin.
         /// </summary>
         public int DalamudApiLevel { get; set; } = 2;
-        
+
         /// <summary>
         /// Load priority for this plugin. Higher values means higher priority. 0 is default priority.
         /// </summary>
