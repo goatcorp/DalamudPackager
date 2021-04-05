@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Nullable>enable</Nullable>
-        <LangVersion>8</LangVersion>
+        <LangVersion>latest</LangVersion>
         <TargetFrameworks>netstandard2.1;net48</TargetFrameworks>
         <!-- Suppresses the warnings about the package not having assemblies in lib/*/.dll.-->
         <NoPackageAnalysis>true</NoPackageAnalysis>
@@ -14,7 +14,7 @@
         <Title>DalamudPackager</Title>
         <Description>An MSBuild task that simplifies making Dalamud plugins by generating a manifest and packing the build output into a release-ready zip.</Description>
         <PackageLicenseExpression>EUPL-1.2</PackageLicenseExpression>
-        <Version>1.2.0</Version>
+        <Version>1.2.1</Version>
         <Authors>Anna Clemens</Authors>
         <PackageProjectUrl>https://github.com/goatcorp/DalamudPackager</PackageProjectUrl>
         <RepositoryUrl>https://github.com/goatcorp/DalamudPackager</RepositoryUrl>
@@ -34,15 +34,15 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Build.Framework" Version="16.8.0" />
-        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.8.0" />
-        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-        <PackageReference Include="YamlDotNet" Version="9.1.0" />
-        <PackageReference Update="@(PackageReference)" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.Build.Framework" Version="16.8.0"/>
+        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.8.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.3"/>
+        <PackageReference Include="YamlDotNet" Version="9.1.0"/>
+        <PackageReference Update="@(PackageReference)" PrivateAssets="All"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Reference Include="System.IO.Compression" />
+        <Reference Include="System.IO.Compression"/>
     </ItemGroup>
 
     <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
