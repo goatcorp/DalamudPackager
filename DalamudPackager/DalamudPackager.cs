@@ -301,6 +301,26 @@ namespace DalamudPackager {
         /// </summary>
         public int LoadPriority { get; set; }
 
+        /// <summary>
+        /// Array of links to screenshots/other images that will be displayed. These images must be 730x380 resolution, with a maximum of 5 images.
+        /// </summary>
+        public List<string>? ImageUrls { get; set; }
+
+        /// <summary>
+        /// Link to a 300x300 icon for your plugin.
+        /// </summary>
+        public string? IconUrl { get; set; }
+
+        /// <summary>
+        /// One-sentence description of your plugin.
+        /// </summary>
+        public string? Punchline { get; set; }
+
+        /// <summary>
+        /// Small description of recent changes to your plugin, only shown for people who have the plugin installed.
+        /// </summary>
+        public string? Changelog { get; set; }
+
         internal bool LogMissing(TaskLoggingHelper log) {
             var anyNull = this.Name == null || this.Author == null || this.Description == null;
 
