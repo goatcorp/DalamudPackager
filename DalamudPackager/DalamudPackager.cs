@@ -307,7 +307,7 @@ namespace DalamudPackager {
         public List<string>? ImageUrls { get; set; }
 
         /// <summary>
-        /// Link to a 300x300 icon for your plugin.
+        /// Link to a 512x512 icon for your plugin.
         /// </summary>
         public string? IconUrl { get; set; }
 
