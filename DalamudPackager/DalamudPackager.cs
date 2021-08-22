@@ -161,7 +161,7 @@ namespace DalamudPackager {
                 ManifestKind.Auto => new[] { "json", "yaml" },
                 ManifestKind.Json => new[] { "json" },
                 ManifestKind.Yaml => new[] { "yaml" },
-                _ => throw new ArgumentOutOfRangeException($"extension doesn't exist for {this.RealManifestType}"),
+                _ => throw new ArgumentOutOfRangeException(nameof(this.RealManifestType), $"extension doesn't exist for {this.RealManifestType}"),
             };
 
             foreach (var ext in exts) {
