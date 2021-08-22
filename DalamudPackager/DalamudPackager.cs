@@ -246,10 +246,7 @@ namespace DalamudPackager {
         Json,
     }
 
-    [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+    [Serializable]
     public class Manifest {
         /// <summary>
         /// The author/s of the plugin.
