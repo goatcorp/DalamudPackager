@@ -108,13 +108,13 @@ namespace DalamudPackager {
             string[] fileNames;
 
             if (includeLen == 0 && excludeLen == 0) {
-                fileNames = Directory.GetFiles(this.OutputPath)
+                fileNames = Directory.EnumerateFiles(this.OutputPath, "*", SearchOption.AllDirectories)
                     .Select(file => file.Substring(this.OutputPath.Length).TrimStart('/', '\\'))
                     .ToArray();
             } else if (includeLen > 0) {
                 fileNames = this.IncludeFiles.ToArray();
             } else {
-                fileNames = Directory.GetFiles(this.OutputPath)
+                fileNames = Directory.EnumerateFiles(this.OutputPath, "*", SearchOption.AllDirectories)
                     .Select(file => file.Substring(this.OutputPath.Length).Replace('/', '\\').TrimStart('\\'))
                     .Where(file => !this.ExcludeFiles.Contains(file))
                     .ToArray();
