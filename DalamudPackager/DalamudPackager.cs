@@ -158,9 +158,9 @@ namespace DalamudPackager {
 
         private Manifest? LoadManifest() {
             var exts = this.RealManifestType switch {
-                ManifestKind.Auto => new[] {"json", "yaml"},
-                ManifestKind.Json => new[] {"json"},
-                ManifestKind.Yaml => new[] {"yaml"},
+                ManifestKind.Auto => new[] { "json", "yaml" },
+                ManifestKind.Json => new[] { "json" },
+                ManifestKind.Yaml => new[] { "yaml" },
                 _ => throw new ArgumentOutOfRangeException($"extension doesn't exist for {this.RealManifestType}"),
             };
 
