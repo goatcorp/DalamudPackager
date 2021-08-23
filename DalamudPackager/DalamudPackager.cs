@@ -17,6 +17,15 @@ namespace DalamudPackager {
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
     public class DalamudPackager : Task {
+        private static readonly string[] ImagePaths = {
+            "icon.png",
+            "image1.png",
+            "image2.png",
+            "image3.png",
+            "image4.png",
+            "image5.png",
+        };
+
         /// <summary>
         /// Set this to $(AssemblyName)
         /// </summary>
@@ -50,6 +59,8 @@ namespace DalamudPackager {
         public byte VersionComponents { get; set; } = 4;
 
         public bool MakeZip { get; set; } = false;
+
+        public bool HandleImages { get; set; } = true;
 
         public string? Exclude { get; set; }
 
@@ -120,6 +131,12 @@ namespace DalamudPackager {
                     .ToArray();
             }
 
+            if (this.HandleImages) {
+                fileNames = fileNames
+                    .Where(file => !ImagePaths.Contains(file))
+                    .ToArray();
+            }
+
             // create zip of files in the output path
             var zipPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             using (var zipFile = File.Create(zipPath)) {
@@ -139,6 +156,19 @@ namespace DalamudPackager {
                 Path.Combine(this.OutputPath, $"{this.AssemblyName}.json"),
                 Path.Combine(zipOutput, $"{this.AssemblyName}.json")
             );
+
+            // copy images to output
+            if (this.HandleImages) {
+                foreach (var path in ImagePaths) {
+                    var actualPath = Path.Combine(this.OutputPath, path);
+                    if (File.Exists(actualPath)) {
+                        File.Copy(
+                            actualPath,
+                            Path.Combine(zipOutput, path)
+                        );
+                    }
+                }
+            }
 
             // move zip to output
             File.Move(
