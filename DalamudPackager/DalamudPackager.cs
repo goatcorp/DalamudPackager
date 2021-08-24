@@ -71,11 +71,27 @@ namespace DalamudPackager {
 
         public string? Include { get; set; }
 
-        private List<string> ExcludeFiles => StringToList(this.Exclude);
+        private Lazy<List<string>> ExcludeFiles => new(() => this.StringToList(this.Exclude));
 
-        private List<string> IncludeFiles => StringToList(this.Include);
+        private Lazy<List<string>> IncludeFiles => new(() => this.StringToList(this.Include));
+
+        private void NormalisePaths() {
+            this.ProjectDir = this.NormalisePath(this.ProjectDir);
+            this.OutputPath = this.NormalisePath(this.OutputPath);
+            this.ImagesPath = this.NormalisePath(this.ImagesPath);
+        }
+
+        private string NormalisePath(string path) {
+            return path
+                .Replace('/', Path.DirectorySeparatorChar)
+                .Replace('\\', Path.DirectorySeparatorChar)
+                .Trim(Path.DirectorySeparatorChar);
+        }
 
         public override bool Execute() {
+            // normalise path attributes
+            this.NormalisePaths();
+
             // load the manifest from the source file
             var manifest = this.LoadManifest();
 
@@ -109,36 +125,37 @@ namespace DalamudPackager {
                 Directory.Delete(zipOutput, true);
             }
 
-            // normalise file lists
-            this.NormaliseFiles();
-
             // determine file names to zip
-            var includeLen = this.IncludeFiles.Count;
-            var excludeLen = this.ExcludeFiles.Count;
+            var includeLen = this.IncludeFiles.Value.Count;
+            var excludeLen = this.ExcludeFiles.Value.Count;
 
             if (includeLen > 0 && excludeLen > 0) {
                 this.Log.LogError("Specify either Include or Exclude on your DalamudPackager task, not both.");
                 return false;
             }
 
+            // File names all using \ as separator
             string[] fileNames;
 
             if (includeLen == 0 && excludeLen == 0) {
                 fileNames = Directory.EnumerateFiles(this.OutputPath, "*", SearchOption.AllDirectories)
-                    .Select(file => file.Substring(this.OutputPath.Length).TrimStart('/', '\\'))
+                    .Select(file => this.NormalisePath(file.Substring(this.OutputPath.Length)))
                     .ToArray();
             } else if (includeLen > 0) {
-                fileNames = this.IncludeFiles.ToArray();
+                fileNames = this.IncludeFiles.Value.ToArray();
             } else {
                 fileNames = Directory.EnumerateFiles(this.OutputPath, "*", SearchOption.AllDirectories)
-                    .Select(file => file.Substring(this.OutputPath.Length).Replace('/', '\\').TrimStart('\\'))
-                    .Where(file => !this.ExcludeFiles.Contains(file))
+                    .Select(file => this.NormalisePath(file.Substring(this.OutputPath.Length)))
+                    .Where(file => !this.ExcludeFiles.Value.Contains(file))
                     .ToArray();
             }
 
+            // remove any images that will be handled
             if (this.HandleImages) {
+                var badPaths = ImagePaths.Select(p => Path.Combine(this.ImagesPath, p)).ToArray();
+
                 fileNames = fileNames
-                    .Where(file => !ImagePaths.Contains(file))
+                    .Where(file => !badPaths.Contains(file))
                     .ToArray();
             }
 
@@ -164,12 +181,18 @@ namespace DalamudPackager {
 
             // copy images to output
             if (this.HandleImages) {
+                var outputImagesPath = Path.Combine(zipOutput, "images");
+
                 foreach (var path in ImagePaths) {
                     var actualPath = Path.Combine(this.OutputPath, this.ImagesPath, path);
                     if (File.Exists(actualPath)) {
+                        if (!Directory.Exists(outputImagesPath)) {
+                            Directory.CreateDirectory(outputImagesPath);
+                        }
+
                         File.Copy(
                             actualPath,
-                            Path.Combine(zipOutput, "images", path)
+                            Path.Combine(outputImagesPath, path)
                         );
                     }
                 }
@@ -247,18 +270,13 @@ namespace DalamudPackager {
             jsonSerialiser.Serialize(jsonStream, manifest);
         }
 
-        private void NormaliseFiles() {
-            this.Include = this.Include?.Replace('/', '\\');
-            this.Exclude = this.Exclude?.Replace('/', '\\');
-        }
-
-        private static List<string> StringToList(string? s) {
+        private List<string> StringToList(string? s) {
             if (s == null) {
                 return new List<string>();
             }
 
             return s.Split(';')
-                .Select(name => name.Trim())
+                .Select(name => this.NormalisePath(name.Trim()))
                 .ToList();
         }
     }
