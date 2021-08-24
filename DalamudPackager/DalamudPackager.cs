@@ -62,6 +62,11 @@ namespace DalamudPackager {
 
         public bool HandleImages { get; set; } = true;
 
+        /// <summary>
+        /// Path to images relative to <see cref="OutputPath"/>.
+        /// </summary>
+        public string ImagesPath { get; set; } = "images";
+
         public string? Exclude { get; set; }
 
         public string? Include { get; set; }
@@ -160,11 +165,11 @@ namespace DalamudPackager {
             // copy images to output
             if (this.HandleImages) {
                 foreach (var path in ImagePaths) {
-                    var actualPath = Path.Combine(this.OutputPath, path);
+                    var actualPath = Path.Combine(this.OutputPath, this.ImagesPath, path);
                     if (File.Exists(actualPath)) {
                         File.Copy(
                             actualPath,
-                            Path.Combine(zipOutput, path)
+                            Path.Combine(zipOutput, "images", path)
                         );
                     }
                 }
