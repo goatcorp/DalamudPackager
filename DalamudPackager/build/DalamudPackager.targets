@@ -4,7 +4,7 @@
         <PackagerTargetFile>$(ProjectDir)DalamudPackager.targets</PackagerTargetFile>
     </PropertyGroup>
 
-    <Import Project="$(PackagerTargetFile)" Condition="Exists('$(PackagerTargetFile)')" />
+    <Import Project="$(PackagerTargetFile)" Condition="Exists('$(PackagerTargetFile)')"/>
 
     <Target Name="DefaultDalamudPackager"
             AfterTargets="Build"
