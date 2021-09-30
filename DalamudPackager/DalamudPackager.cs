@@ -342,6 +342,11 @@ namespace DalamudPackager {
         public List<string>? Tags { get; set; }
 
         /// <summary>
+        /// List of the category tags defined on the plugin.
+        /// </summary>
+        public List<string>? CategoryTags { get; set; }
+
+        /// <summary>
         /// The API level of this plugin.
         /// </summary>
         public int DalamudApiLevel { get; set; } = 4;
