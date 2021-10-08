@@ -85,7 +85,7 @@ namespace DalamudPackager {
             return path
                 .Replace('/', Path.DirectorySeparatorChar)
                 .Replace('\\', Path.DirectorySeparatorChar)
-                .Trim(Path.DirectorySeparatorChar);
+                .TrimEnd(Path.DirectorySeparatorChar);
         }
 
         public override bool Execute() {
@@ -139,13 +139,13 @@ namespace DalamudPackager {
 
             if (includeLen == 0 && excludeLen == 0) {
                 fileNames = Directory.EnumerateFiles(this.OutputPath, "*", SearchOption.AllDirectories)
-                    .Select(file => this.NormalisePath(file.Substring(this.OutputPath.Length)))
+                    .Select(file => this.NormalisePath(file.Substring(this.OutputPath.Length + 1)))
                     .ToArray();
             } else if (includeLen > 0) {
                 fileNames = this.IncludeFiles.Value.ToArray();
             } else {
                 fileNames = Directory.EnumerateFiles(this.OutputPath, "*", SearchOption.AllDirectories)
-                    .Select(file => this.NormalisePath(file.Substring(this.OutputPath.Length)))
+                    .Select(file => this.NormalisePath(file.Substring(this.OutputPath.Length + 1)))
                     .Where(file => !this.ExcludeFiles.Value.Contains(file))
                     .ToArray();
             }
