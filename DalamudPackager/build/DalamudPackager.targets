@@ -6,7 +6,16 @@
 
     <Import Project="$(PackagerTargetFile)" Condition="Exists('$(PackagerTargetFile)')"/>
 
-    <Target Name="DefaultDalamudPackager"
+    <Target Name="DefaultDalamudPackagerDebug"
+            AfterTargets="Build"
+            Condition="'$(Configuration)' == 'Debug' and !Exists('$(PackagerTargetFile)')">
+        <DalamudPackager ProjectDir="$(ProjectDir)"
+                         OutputPath="$(OutputPath)"
+                         AssemblyName="$(AssemblyName)"
+                         MakeZip="false"/>
+    </Target>
+
+    <Target Name="DefaultDalamudPackagerRelease"
             AfterTargets="Build"
             Condition="'$(Configuration)' == 'Release' and !Exists('$(PackagerTargetFile)')">
         <DalamudPackager ProjectDir="$(ProjectDir)"

@@ -377,7 +377,7 @@ namespace DalamudPackager {
         public string? Changelog { get; set; }
 
         internal bool LogMissing(TaskLoggingHelper log) {
-            var anyNull = this.Name == null || this.Author == null || this.Description == null;
+            var anyNull = this.Name == null || this.Author == null || this.Description == null || this.Punchline == null;
 
             if (this.Name == null) {
                 log.LogError("Plugin name is required in your manifest.");
@@ -389,6 +389,10 @@ namespace DalamudPackager {
 
             if (this.Description == null) {
                 log.LogError("Description is required in your plugin manifest.");
+            }
+
+            if (this.Punchline == null) {
+                log.LogError("Punchline is required in your plugin manifest.");
             }
 
             return anyNull;
