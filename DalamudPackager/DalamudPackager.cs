@@ -376,6 +376,21 @@ namespace DalamudPackager {
         /// </summary>
         public string? Changelog { get; set; }
 
+        /// <summary>
+        /// Gets notice/warning to display for plugin (can be used where there is an issue but not ban worthy).
+        /// </summary>
+        public string? Notice { get; set; }
+
+        /// <summary>
+        /// Gets or sets developer support state.
+        /// </summary>
+        public int? DevSupportState { get; set; } = 0;
+
+        /// <summary>
+        /// Gets or sets reason / comment for the current developer state.
+        /// </summary>
+        public string? DevSupportStateReason { get; set; }
+        
         internal bool LogMissing(TaskLoggingHelper log) {
             var anyNull = this.Name == null || this.Author == null || this.Description == null || this.Punchline == null;
 

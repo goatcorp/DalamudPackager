@@ -70,7 +70,11 @@ following JSON file in your output directory.
   // this will be set to 2 automatically
   "DalamudApiLevel": 2,
   // this will be set to 0 automatically
-  "LoadPriority": 0
+  "LoadPriority": 0,
+  // these following statuses should only be filled out in special cases
+  "Notice": "Warning, you better backup!",
+  "DevSupportState": "2",
+  "DevSupportStateReason": "Need a new dev!",
 }
 #+end_src
 
