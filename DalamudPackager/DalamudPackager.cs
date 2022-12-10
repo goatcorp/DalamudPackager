@@ -352,6 +352,20 @@ namespace DalamudPackager {
         public int DalamudApiLevel { get; set; } = 7;
 
         /// <summary>
+        /// Gets the required Dalamud load step for this plugin to load. Takes precedence over LoadPriority.
+        /// Valid values are:
+        /// 0. During Framework.Tick, when drawing facilities are available.
+        /// 1. During Framework.Tick.
+        /// 2. No requirement.
+        /// </summary>
+        public int LoadRequiredState { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether Dalamud must load this plugin not at the same time with other plugins and the game.
+        /// </summary>
+        public bool LoadSync { get; set; }
+
+        /// <summary>
         /// Load priority for this plugin. Higher values means higher priority. 0 is default priority.
         /// </summary>
         public int LoadPriority { get; set; }
