@@ -390,6 +390,16 @@ namespace DalamudPackager {
         /// </summary>
         public string? Changelog { get; set; }
 
+        /// <summary>
+        /// Gets a value indicating whether this plugin accepts feedback.
+        /// </summary>
+        public bool AcceptsFeedback { get; set; } = true;
+
+        /// <summary>
+        /// Gets a message that is shown to users when sending feedback.
+        /// </summary>
+        public string? FeedbackMessage { get; set; }
+
         internal bool LogMissing(TaskLoggingHelper log) {
             var anyNull = this.Name == null || this.Author == null || this.Description == null || this.Punchline == null;
 
