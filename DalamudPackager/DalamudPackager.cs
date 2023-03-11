@@ -364,6 +364,11 @@ namespace DalamudPackager {
         /// Gets a value indicating whether Dalamud must load this plugin not at the same time with other plugins and the game.
         /// </summary>
         public bool LoadSync { get; set; }
+        
+        /// <summary>
+        /// Gets a value indicating whether Dalamud can unload the plugin outside of the Framework thread.
+        /// </summary>
+        public bool CanUnloadAsync { get; set; }
 
         /// <summary>
         /// Load priority for this plugin. Higher values means higher priority. 0 is default priority.
