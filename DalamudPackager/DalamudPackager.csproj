@@ -15,7 +15,7 @@
         <Description>An MSBuild task that simplifies making Dalamud plugins by generating a manifest and packing the build output into a release-ready zip.</Description>
         <PackageLicenseExpression>EUPL-1.2</PackageLicenseExpression>
         <Version>2.1.13</Version>
-        <Authors>Anna Clemens</Authors>
+        <Authors>Anna Clemens, goatcorp contributors</Authors>
         <PackageProjectUrl>https://github.com/goatcorp/DalamudPackager</PackageProjectUrl>
         <RepositoryUrl>https://github.com/goatcorp/DalamudPackager</RepositoryUrl>
     </PropertyGroup>
