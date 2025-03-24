@@ -349,7 +349,7 @@ namespace DalamudPackager {
         /// <summary>
         /// The API level of this plugin.
         /// </summary>
-        public int DalamudApiLevel { get; set; } = 11;
+        public int DalamudApiLevel { get; set; } = 12;
 
         /// <summary>
         /// Gets the required Dalamud load step for this plugin to load. Takes precedence over LoadPriority.
