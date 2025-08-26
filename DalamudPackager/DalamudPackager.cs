@@ -322,6 +322,11 @@ namespace DalamudPackager {
         public string? AssemblyVersion { get; set; }
 
         /// <summary>
+        /// Gets the minimum Dalamud assembly version this plugin requires.
+        /// </summary>
+        public string? MinimumDalamudVersion { get; }
+
+        /// <summary>
         /// A description of the plugins functions.
         /// </summary>
         public string? Description { get; set; }
