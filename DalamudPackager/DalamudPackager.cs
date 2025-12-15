@@ -1,4 +1,4 @@
-using System;
+﻿ng System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -465,7 +465,7 @@ namespace DalamudPackager {
         /// <summary>
         /// The API level of this plugin.
         /// </summary>
-        public int DalamudApiLevel { get; set; } = 13;
+        public int DalamudApiLevel { get; set; } = 14;
 
         /// <summary>
         /// Gets the required Dalamud load step for this plugin to load. Takes precedence over LoadPriority.
