@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -71,17 +71,63 @@ namespace DalamudPackager {
 
         public string? Include { get; set; }
 
+        #region Packager Manifest Properties
+
+        public string? Author { get; set; }
+
+        public string? Name { get; set; }
+
+        public string? InternalName { get; set; }
+
+        public string? AssemblyVersion { get; set; }
+
+        public string? MinimumDalamudVersion { get; set; }
+
+        public string? Description { get; set; }
+
+        public string? ApplicableVersion { get; set; }
+
+        public string? RepoUrl { get; set; }
+
+        public string? Tags { get; set; }
+
+        public string? CategoryTags { get; set; }
+
+        public string? DalamudApiLevel { get; set; }
+
+        public string? LoadRequiredState { get; set; }
+
+        public string? LoadSync { get; set; }
+
+        public string? CanUnloadAsync { get; set; }
+
+        public string? LoadPriority { get; set; }
+
+        public string? ImageUrls { get; set; }
+
+        public string? IconUrl { get; set; }
+
+        public string? Punchline { get; set; }
+
+        public string? Changelog { get; set; }
+
+        public string? AcceptsFeedback { get; set; }
+
+        public string? FeedbackMessage { get; set; }
+
+        #endregion
+
         private Lazy<List<string>> ExcludeFiles => new(() => this.StringToList(this.Exclude));
 
         private Lazy<List<string>> IncludeFiles => new(() => this.StringToList(this.Include));
 
-        private void NormalisePaths() {
-            this.ProjectDir = this.NormalisePath(this.ProjectDir);
-            this.OutputPath = this.NormalisePath(this.OutputPath);
-            this.ImagesPath = this.NormalisePath(this.ImagesPath);
+        private void NormalizePaths() {
+            this.ProjectDir = this.NormalizePath(this.ProjectDir);
+            this.OutputPath = this.NormalizePath(this.OutputPath);
+            this.ImagesPath = this.NormalizePath(this.ImagesPath);
         }
 
-        private string NormalisePath(string path) {
+        private string NormalizePath(string path) {
             return path
                 .Replace('/', Path.DirectorySeparatorChar)
                 .Replace('\\', Path.DirectorySeparatorChar)
@@ -90,15 +136,10 @@ namespace DalamudPackager {
 
         public override bool Execute() {
             // normalise path attributes
-            this.NormalisePaths();
+            this.NormalizePaths();
 
-            // load the manifest from the source file
+            // load the manifest
             var manifest = this.LoadManifest();
-
-            if (manifest == null) {
-                this.Log.LogError("Could not find manifest file in project directory.");
-                return false;
-            }
 
             // verify required fields on the manifest
             if (manifest.LogMissing(this.Log)) {
@@ -139,13 +180,13 @@ namespace DalamudPackager {
 
             if (includeLen == 0 && excludeLen == 0) {
                 fileNames = Directory.EnumerateFiles(this.OutputPath, "*", SearchOption.AllDirectories)
-                    .Select(file => this.NormalisePath(file.Substring(this.OutputPath.Length + 1)))
+                    .Select(file => this.NormalizePath(file.Substring(this.OutputPath.Length + 1)))
                     .ToArray();
             } else if (includeLen > 0) {
                 fileNames = this.IncludeFiles.Value.ToArray();
             } else {
                 fileNames = Directory.EnumerateFiles(this.OutputPath, "*", SearchOption.AllDirectories)
-                    .Select(file => this.NormalisePath(file.Substring(this.OutputPath.Length + 1)))
+                    .Select(file => this.NormalizePath(file.Substring(this.OutputPath.Length + 1)))
                     .Where(file => !this.ExcludeFiles.Value.Contains(file))
                     .ToArray();
             }
@@ -214,13 +255,15 @@ namespace DalamudPackager {
             return System.Reflection.AssemblyName.GetAssemblyName(fullPath);
         }
 
-        private Manifest? LoadManifest() {
+        private Manifest LoadManifest() {
             var exts = this.RealManifestType switch {
                 ManifestKind.Auto => new[] { "json", "yaml" },
                 ManifestKind.Json => new[] { "json" },
                 ManifestKind.Yaml => new[] { "yaml" },
                 _ => throw new ArgumentOutOfRangeException(nameof(this.RealManifestType), $"extension doesn't exist for {this.RealManifestType}"),
             };
+
+            Manifest? manifest = null;
 
             foreach (var ext in exts) {
                 var manifestPath = Path.Combine(this.ProjectDir, $"{this.AssemblyName}.{ext}");
@@ -232,14 +275,15 @@ namespace DalamudPackager {
                 using var manifestFile = File.Open(manifestPath, FileMode.Open);
                 using var manifestStream = new StreamReader(manifestFile);
 
-                return ext switch {
+                manifest = ext switch {
                     "json" => LoadJsonManifest(manifestStream),
                     "yaml" => LoadYamlManifest(manifestStream),
                     _ => throw new Exception("unreachable"),
                 };
             }
 
-            return null;
+            manifest ??= new();
+            return ApplyManifestProperties(manifest);
         }
 
         private static Manifest LoadYamlManifest(TextReader reader) {
@@ -270,14 +314,81 @@ namespace DalamudPackager {
             jsonSerialiser.Serialize(jsonStream, manifest);
         }
 
-        private List<string> StringToList(string? s) {
+        private List<string> StringToList(string? s, bool normalizePaths = true) {
             if (s == null) {
                 return new List<string>();
             }
 
             return s.Split(';')
-                .Select(name => this.NormalisePath(name.Trim()))
+                .Select(name => normalizePaths ? this.NormalizePath(name.Trim()) : name.Trim())
                 .ToList();
+        }
+
+        private Manifest ApplyManifestProperties(Manifest manifest) {
+            if (!string.IsNullOrEmpty(Author))
+                manifest.Author = Author;
+
+            if (!string.IsNullOrEmpty(Name))
+                manifest.Name = Name;
+
+            if (!string.IsNullOrEmpty(InternalName))
+                manifest.InternalName = InternalName;
+
+            if (!string.IsNullOrEmpty(AssemblyVersion))
+                manifest.AssemblyVersion = AssemblyVersion;
+
+            if (!string.IsNullOrEmpty(MinimumDalamudVersion))
+                manifest.MinimumDalamudVersion = MinimumDalamudVersion;
+
+            if (!string.IsNullOrEmpty(Description))
+                manifest.Description = Description;
+
+            if (!string.IsNullOrEmpty(ApplicableVersion))
+                manifest.ApplicableVersion = ApplicableVersion!;
+
+            if (!string.IsNullOrEmpty(RepoUrl))
+                manifest.RepoUrl = RepoUrl;
+
+            if (!string.IsNullOrEmpty(Tags))
+                manifest.Tags = StringToList(Tags, false);
+
+            if (!string.IsNullOrEmpty(CategoryTags))
+                manifest.CategoryTags = StringToList(CategoryTags, false);
+
+            if (!string.IsNullOrEmpty(DalamudApiLevel) && int.TryParse(DalamudApiLevel, out var dalamudApiLevel))
+                manifest.DalamudApiLevel = dalamudApiLevel;
+
+            if (!string.IsNullOrEmpty(LoadRequiredState) && int.TryParse(LoadRequiredState, out var loadRequiredState))
+                manifest.LoadRequiredState = loadRequiredState;
+
+            if (!string.IsNullOrEmpty(LoadSync) && bool.TryParse(LoadSync, out var loadSync))
+                manifest.LoadSync = loadSync;
+
+            if (!string.IsNullOrEmpty(CanUnloadAsync) && bool.TryParse(CanUnloadAsync, out var canUnloadAsync))
+                manifest.CanUnloadAsync = canUnloadAsync;
+
+            if (!string.IsNullOrEmpty(LoadPriority) && int.TryParse(LoadPriority, out var loadPriority))
+                manifest.LoadPriority = loadPriority;
+
+            if (!string.IsNullOrEmpty(ImageUrls))
+                manifest.ImageUrls = StringToList(ImageUrls, false);
+
+            if (!string.IsNullOrEmpty(IconUrl))
+                manifest.IconUrl = IconUrl;
+
+            if (!string.IsNullOrEmpty(Punchline))
+                manifest.Punchline = Punchline;
+
+            if (!string.IsNullOrEmpty(Changelog))
+                manifest.Changelog = Changelog;
+
+            if (!string.IsNullOrEmpty(AcceptsFeedback) && bool.TryParse(AcceptsFeedback, out var acceptsFeedback))
+                manifest.AcceptsFeedback = acceptsFeedback;
+
+            if (!string.IsNullOrEmpty(FeedbackMessage))
+                manifest.FeedbackMessage = FeedbackMessage;
+
+            return manifest;
         }
     }
 
@@ -324,7 +435,7 @@ namespace DalamudPackager {
         /// <summary>
         /// Gets the minimum Dalamud assembly version this plugin requires.
         /// </summary>
-        public string? MinimumDalamudVersion { get; }
+        public string? MinimumDalamudVersion { get; set; }
 
         /// <summary>
         /// A description of the plugins functions.
@@ -369,7 +480,7 @@ namespace DalamudPackager {
         /// Gets a value indicating whether Dalamud must load this plugin not at the same time with other plugins and the game.
         /// </summary>
         public bool LoadSync { get; set; }
-        
+
         /// <summary>
         /// Gets a value indicating whether Dalamud can unload the plugin outside of the Framework thread.
         /// </summary>
