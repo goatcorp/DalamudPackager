@@ -45,7 +45,7 @@ namespace DalamudPackager {
         public string OutputPath { get; set; } = null!;
 
         /// <summary>
-        /// This can be either "auto", "json", or "yaml"
+        /// This can be either "auto", "json", "yaml" or "csproj"
         /// </summary>
         public string ManifestType { get; set; } = "auto";
 
@@ -53,7 +53,8 @@ namespace DalamudPackager {
             "auto" => ManifestKind.Auto,
             "json" => ManifestKind.Json,
             "yaml" => ManifestKind.Yaml,
-            _ => throw new ArgumentException("Invalid manifest type: expected either 'auto', 'json', or 'yaml'", nameof(this.ManifestType)),
+            "csproj" => ManifestKind.Csproj,
+            _ => throw new ArgumentException("Invalid manifest type: expected either 'auto', 'json', 'yaml' or 'csproj'", nameof(this.ManifestType)),
         };
 
         public byte VersionComponents { get; set; } = 4;
@@ -76,10 +77,6 @@ namespace DalamudPackager {
         public string? Author { get; set; }
 
         public string? Name { get; set; }
-
-        public string? InternalName { get; set; }
-
-        public string? AssemblyVersion { get; set; }
 
         public string? MinimumDalamudVersion { get; set; }
 
@@ -257,15 +254,21 @@ namespace DalamudPackager {
 
         private Manifest LoadManifest() {
             var exts = this.RealManifestType switch {
-                ManifestKind.Auto => new[] { "json", "yaml" },
+                ManifestKind.Auto => new[] { "json", "yaml", "csproj" },
                 ManifestKind.Json => new[] { "json" },
                 ManifestKind.Yaml => new[] { "yaml" },
+                ManifestKind.Csproj => new[] { "csproj" },
                 _ => throw new ArgumentOutOfRangeException(nameof(this.RealManifestType), $"extension doesn't exist for {this.RealManifestType}"),
             };
 
             Manifest? manifest = null;
 
             foreach (var ext in exts) {
+                if (ext is "csproj") {
+                    manifest = LoadCsprojManifest();
+                    break;
+                }
+
                 var manifestPath = Path.Combine(this.ProjectDir, $"{this.AssemblyName}.{ext}");
 
                 if (!File.Exists(manifestPath)) {
@@ -280,10 +283,12 @@ namespace DalamudPackager {
                     "yaml" => LoadYamlManifest(manifestStream),
                     _ => throw new Exception("unreachable"),
                 };
+
+                if (manifest != null)
+                    break;
             }
 
-            manifest ??= new();
-            return ApplyManifestProperties(manifest);
+            return manifest ?? new();
         }
 
         private static Manifest LoadYamlManifest(TextReader reader) {
@@ -324,18 +329,14 @@ namespace DalamudPackager {
                 .ToList();
         }
 
-        private Manifest ApplyManifestProperties(Manifest manifest) {
+        private Manifest LoadCsprojManifest() {
+            var manifest = new Manifest();
+
             if (!string.IsNullOrEmpty(Author))
                 manifest.Author = Author;
 
             if (!string.IsNullOrEmpty(Name))
                 manifest.Name = Name;
-
-            if (!string.IsNullOrEmpty(InternalName))
-                manifest.InternalName = InternalName;
-
-            if (!string.IsNullOrEmpty(AssemblyVersion))
-                manifest.AssemblyVersion = AssemblyVersion;
 
             if (!string.IsNullOrEmpty(MinimumDalamudVersion))
                 manifest.MinimumDalamudVersion = MinimumDalamudVersion;
@@ -394,7 +395,7 @@ namespace DalamudPackager {
 
     public enum ManifestKind {
         /// <summary>
-        /// Automatically searches for JSON manifests, then searches for YAML manifests if no JSON could be found.
+        /// Automatically searches for JSON manifests, then searches for YAML manifests if no JSON could be found, then uses the csproj file as fallback.
         /// </summary>
         Auto,
 
@@ -408,6 +409,11 @@ namespace DalamudPackager {
         /// Inferior manifest type. Not meant for human consumption.
         /// </summary>
         Json,
+
+        /// <summary>
+        /// Single file project definition.
+        /// </summary>
+        Csproj,
     }
 
     [Serializable]
