@@ -78,10 +78,6 @@ namespace DalamudPackager {
 
         public string? Name { get; set; }
 
-        public string? InternalName { get; set; }
-
-        public string? AssemblyVersion { get; set; }
-
         public string? MinimumDalamudVersion { get; set; }
 
         public string? Description { get; set; }
@@ -341,12 +337,6 @@ namespace DalamudPackager {
 
             if (!string.IsNullOrEmpty(Name))
                 manifest.Name = Name;
-
-            if (!string.IsNullOrEmpty(InternalName))
-                manifest.InternalName = InternalName;
-
-            if (!string.IsNullOrEmpty(AssemblyVersion))
-                manifest.AssemblyVersion = AssemblyVersion;
 
             if (!string.IsNullOrEmpty(MinimumDalamudVersion))
                 manifest.MinimumDalamudVersion = MinimumDalamudVersion;
