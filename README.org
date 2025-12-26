@@ -13,6 +13,7 @@ plugin manifest and ~latest.zip~.
 - [[#configuration][Configuration]]
 - [[#manifest-generation][Manifest generation]]
 - [[#yaml-manifests][YAML manifests]]
+- [[#csproj-manifests][csproj manifests]]
 - [[#zip-file-generation][~.zip~ file generation]]
 - [[#task-attributes][Task attributes]]
 
@@ -95,6 +96,35 @@ description: |-
 repo_url: https://example.com/
 #+end_src
 
+* csproj manifests
+
+If you prefer to keep your configuration in your ~.csproj~ file, you can specify
+almost all manifest fields directly as properties.
+
+#+begin_src xml
+<PropertyGroup>
+    <Author>You</Author>
+    <Name>Sample Plugin</Name>
+    <MinimumDalamudVersion>13.0.0</MinimumDalamudVersion>
+    <Punchline>A short one-liner that shows up in /xlplugins.</Punchline>
+    <Description>A description that shows up in /xlplugins. List any major slash-command(s).</Description>
+    <ApplicableVersion>2025.10.30.0000.0000</ApplicableVersion>
+    <RepoUrl>https://github.com/goatcorp/SamplePlugin</RepoUrl>
+    <Tags>sample;plugin;goats</Tags>
+    <CategoryTags>debug;test</CategoryTags>
+    <DalamudApiLevel>14</DalamudApiLevel>
+    <LoadRequiredState>1</LoadRequiredState>
+    <LoadSync>true</LoadSync>
+    <CanUnloadAsync>true</CanUnloadAsync>
+    <LoadPriority>1</LoadPriority>
+    <ImageUrls>https://raw.githubusercontent.com/goatcorp/DalamudPluginsD17/refs/heads/main/stable/SamplePlugin/images/image1.png;https://raw.githubusercontent.com/goatcorp/DalamudPluginsD17/refs/heads/main/stable/SamplePlugin/images/image2.png</ImageUrls>
+    <IconUrl>https://raw.githubusercontent.com/goatcorp/DalamudPluginsD17/refs/heads/main/stable/SamplePlugin/images/icon.png</IconUrl>
+    <Changelog>CHANGES!</Changelog>
+    <AcceptsFeedback>true</AcceptsFeedback>
+    <FeedbackMessage>Be nice.</FeedbackMessage>
+</PropertyGroup>
+#+end_src
+
 * ~.zip~ file generation
 
 DalamudPackager will also create a folder with ~latest.zip~ for you if
@@ -109,13 +139,34 @@ if you want to change this.
 
 * Task attributes
 
-| Attribute           | Description                                                                                                                                                                                          | Required | Default                           |
-|---------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------+-----------------------------------|
-| ~ProjectDir~        | This is the path where your ~csproj~ is located. You must set this to ~$(ProjectDir)~.                                                                                                               | *Yes*    | /None/ - set to ~$(ProjectDir)~   |
-| ~OutputPath~        | This is the path that your assemblies are output to after build. You must set this to ~$(OutputPath)~.                                                                                               | *Yes*    | /None/ - set to ~$(OutputPath)~   |
-| ~AssemblyName~      | This is the name of the assembly that Dalamud will be loading. You used to need to specify this in your manifest as ~InternalName~.                                                                  | *Yes*    | /None/ - set to ~$(AssemblyName)~ |
-| ~ManifestType~      | You can choose between ~auto~, ~json~, and ~yaml~ for your manifest file. ~auto~ will use ~json~ first, then fall back on ~yaml~.                                                                    | No       | ~auto~                            |
-| ~VersionComponents~ | How many components of the assembly's version to include in the generated manifest. If you use semantic versioning, set this to ~3~.                                                                 | No       | ~4~                               |
-| ~MakeZip~           | If this is ~true~, a folder will be created in your ~OutputPath~ that contains your generated manifest and ~latest.zip~, reading for PRing.                                                          | No       | ~false~                           |
-| ~Exclude~           | Files to exclude from the zip if ~MakeZip~ is ~true~. Mutually exclusive with ~Include~. Files should be separated by a semicolon (~;~) and be relative to ~OutputPath~. Files do not need to exist. | No       | /None/                            |
-| ~Include~           | Files to include in the zip if ~MakeZip~ is ~true~. Mutually exclusive with ~Exclude~. Files should be separated by a semicolon (~;~) and be relative to ~OutputPath~. Files must exist.             | No       | /None/                            |
+If you set ~ManifestType~ to ~csproj~, you can specify your manifest fields directly in the task attributes. The following table lists all available attributes:
+
+| Attribute               | Description                                                                                                                                                                                          | Required | Default                           |
+|-------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------+-----------------------------------|
+| ~ProjectDir~            | This is the path where your ~csproj~ is located. You must set this to ~$(ProjectDir)~.                                                                                                               | *Yes*    | /None/ - set to ~$(ProjectDir)~   |
+| ~OutputPath~            | This is the path that your assemblies are output to after build. You must set this to ~$(OutputPath)~.                                                                                               | *Yes*    | /None/ - set to ~$(OutputPath)~   |
+| ~AssemblyName~          | This is the name of the assembly that Dalamud will be loading. You used to need to specify this in your manifest as ~InternalName~.                                                                  | *Yes*    | /None/ - set to ~$(AssemblyName)~ |
+| ~ManifestType~          | You can choose between ~auto~, ~json~, ~yaml~, and ~csproj~ for your manifest file. ~auto~ will use ~json~ first, then fall back on ~yaml~, then fall back on ~csproj~.                              | No       | ~auto~                            |
+| ~VersionComponents~     | How many components of the assembly's version to include in the generated manifest. If you use semantic versioning, set this to ~3~.                                                                 | No       | ~4~                               |
+| ~MakeZip~               | If this is ~true~, a folder will be created in your ~OutputPath~ that contains your generated manifest and ~latest.zip~, reading for PRing.                                                          | No       | ~false~                           |
+| ~Exclude~               | Files to exclude from the zip if ~MakeZip~ is ~true~. Mutually exclusive with ~Include~. Files should be separated by a semicolon (~;~) and be relative to ~OutputPath~. Files do not need to exist. | No       | /None/                            |
+| ~Include~               | Files to include in the zip if ~MakeZip~ is ~true~. Mutually exclusive with ~Exclude~. Files should be separated by a semicolon (~;~) and be relative to ~OutputPath~. Files must exist.             | No       | /None/                            |
+| ~Author~                | Manifest field defined as csproj property for the plugin's author.                                                                                                                                   | No       | /None/                            |
+| ~Name~                  | Manifest field defined as csproj property for the plugin's name.                                                                                                                                     | No       | /None/                            |
+| ~MinimumDalamudVersion~ | Manifest field defined as csproj property for the plugin's minimum Dalamud version.                                                                                                                  | No       | /None/                            |
+| ~Description~           | Manifest field defined as csproj property for the plugin's description.                                                                                                                              | No       | /None/                            |
+| ~ApplicableVersion~     | Manifest field defined as csproj property for the plugin's applicable version.                                                                                                                       | No       | /None/                            |
+| ~RepoUrl~               | Manifest field defined as csproj property for the plugin's repository URL.                                                                                                                           | No       | /None/                            |
+| ~Tags~                  | Manifest field defined as csproj property for the plugin's tags.                                                                                                                                     | No       | /None/                            |
+| ~CategoryTags~          | Manifest field defined as csproj property for the plugin's category tags.                                                                                                                            | No       | /None/                            |
+| ~DalamudApiLevel~       | Manifest field defined as csproj property for the plugin's Dalamud API level.                                                                                                                        | No       | /None/                            |
+| ~LoadRequiredState~     | Manifest field defined as csproj property for the plugin's load required state.                                                                                                                      | No       | /None/                            |
+| ~LoadSync~              | Manifest field defined as csproj property for if the plugin loads synchronously.                                                                                                                     | No       | /None/                            |
+| ~CanUnloadAsync~        | Manifest field defined as csproj property for if the plugin can unload asynchronously.                                                                                                               | No       | /None/                            |
+| ~LoadPriority~          | Manifest field defined as csproj property for the plugin's load priority.                                                                                                                            | No       | /None/                            |
+| ~ImageUrls~             | Manifest field defined as csproj property for the plugin's image URLs.                                                                                                                               | No       | /None/                            |
+| ~IconUrl~               | Manifest field defined as csproj property for the plugin's icon URL.                                                                                                                                 | No       | /None/                            |
+| ~Punchline~             | Manifest field defined as csproj property for the plugin's punchline.                                                                                                                                | No       | /None/                            |
+| ~Changelog~             | Manifest field defined as csproj property for the plugin's changelog.                                                                                                                                | No       | /None/                            |
+| ~AcceptsFeedback~       | Manifest field defined as csproj property for if the plugin accepts feedback.                                                                                                                        | No       | /None/                            |
+| ~FeedbackMessage~       | Manifest field defined as csproj property for the plugin's feedback message.                                                                                                                         | No       | /None/                            |
