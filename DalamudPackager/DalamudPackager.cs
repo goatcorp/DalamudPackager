@@ -172,7 +172,6 @@ namespace DalamudPackager {
                 return false;
             }
 
-            // File names all using \ as separator
             string[] fileNames;
 
             if (includeLen == 0 && excludeLen == 0) {
@@ -203,7 +202,8 @@ namespace DalamudPackager {
                 using (var zip = new ZipArchive(zipFile, ZipArchiveMode.Create)) {
                     foreach (var file in fileNames) {
                         var filePath = Path.Combine(this.OutputPath, file);
-                        zip.CreateEntryFromFile(filePath, file);
+                        var entryName = file.Replace('\\', '/');
+                        zip.CreateEntryFromFile(filePath, entryName);
                     }
                 }
             }
